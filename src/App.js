@@ -10,32 +10,54 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setPreview(URL.createObjectURL(e.target.files[0]));
+      const file = e.target.files[0];
+      setPreview(URL.createObjectURL(file));
+
+      // Cloudinary upload
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "hairstyle_unsigned"); // ✅ required
+      formData.append("folder", "samples/ecommerce");
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/dblluor62/image/upload`, // ✅ use your cloud name
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      console.log("Cloudinary upload response:", data);
+
+      // ✅ store Cloudinary secure_url
+      setFile(data.secure_url);
     }
   };
+
 
   const handleGenerate = async () => {
     if (!file) return;
     setLoading(true);
 
-    const toBase64 = (file) =>
-      new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+    // const toBase64 = (file) =>
+    //   new Promise((resolve, reject) => {
+    //     const reader = new FileReader();
+    //     reader.onloadend = () => resolve(reader.result);
+    //     reader.onerror = reject;
+    //     reader.readAsDataURL(file);
+    //   });
 
-    const imageBase64 = await toBase64(file);
+    // const imageBase64 = await toBase64(file);
+
 
     const res = await fetch("https://hair-style-back-end-production.up.railway.app/hairstyle/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        source: imageBase64,
+        source: file,
         styleDescription: style,
         color,
       }),
