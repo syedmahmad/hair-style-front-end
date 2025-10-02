@@ -31,7 +31,7 @@ function App() {
 
     const imageBase64 = await toBase64(file);
 
-    const res = await fetch("http://localhost:4000/hairstyle/generate", {
+    const res = await fetch("https://hair-style-back-end-production.up.railway.app/hairstyle/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -54,13 +54,13 @@ function App() {
     // }
 
     console.log("images", images);
-    
+
 
     setResults(images);
     setLoading(false);
 
     console.log("results:", results);
-    
+
   };
 
   return (
@@ -110,7 +110,7 @@ function App() {
             value={color}
             onChange={(e) => setColor(e.target.value)}
             className="p-4 h-10 cursor-pointer rounded"
-            style={{ color: "black"}}
+            style={{ color: "black" }}
           />
         </div>
 
