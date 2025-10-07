@@ -10,23 +10,62 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
 
+  // --- Helper: convert RGBA image to 3-channel RGB (JPG)
+  const convertTo3ChannelRGB = async (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        // Draw image on canvas without alpha
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+        // Fill white background (so transparent pixels become white)
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+
+        // Export as JPEG (3-channel)
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const rgbFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + "_rgb.jpg", {
+                type: "image/jpeg",
+              });
+              resolve(rgbFile);
+            } else reject(new Error("Failed to convert image."));
+          },
+          "image/jpeg",
+          0.95
+        );
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const handleFileChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setPreview(URL.createObjectURL(file));
+      let selectedFile = e.target.files[0];
+      setPreview(URL.createObjectURL(selectedFile));
 
-      // Cloudinary upload
+      // ✅ Convert 4-channel (RGBA) to 3-channel (RGB)
+      try {
+        selectedFile = await convertTo3ChannelRGB(selectedFile);
+      } catch (err) {
+        console.error("RGB conversion failed, using original file:", err);
+      }
+
+      // ✅ Cloudinary upload
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "hairstyle_unsigned"); // ✅ required
+      formData.append("file", selectedFile);
+      formData.append("upload_preset", "hairstyle_unsigned");
       formData.append("folder", "samples/ecommerce");
 
       const res = await fetch(
-        `https://api.cloudinary.com/v1_1/dblluor62/image/upload`, // ✅ use your cloud name
-        {
-          method: "POST",
-          body: formData,
-        }
+        `https://api.cloudinary.com/v1_1/dblluor62/image/upload`,
+        { method: "POST", body: formData }
       );
 
       const data = await res.json();
@@ -37,23 +76,11 @@ function App() {
     }
   };
 
-
   const handleGenerate = async () => {
     if (!file) return;
     setLoading(true);
 
-    // const toBase64 = (file) =>
-    //   new Promise((resolve, reject) => {
-    //     const reader = new FileReader();
-    //     reader.onloadend = () => resolve(reader.result);
-    //     reader.onerror = reject;
-    //     reader.readAsDataURL(file);
-    //   });
-
-    // const imageBase64 = await toBase64(file);
-
-
-    const res = await fetch("https://hair-style-back-end-production.up.railway.app/hairstyle/generate", {
+    const res = await fetch("http://localhost:4000/hairstyle/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -66,23 +93,13 @@ function App() {
     const data = await res.json();
     console.log("backend response:", data);
 
-    // ✅ Collect images from backend response
     const images = [];
-    if (data.images.replicateUrls && Array.isArray(data.images.replicateUrls)) {
+    if (data.images?.replicateUrls && Array.isArray(data.images.replicateUrls)) {
       images.push(...data.images.replicateUrls);
     }
-    // if (data.localUrl) {
-    //   images.push(data.images.localUrl);
-    // }
-
-    console.log("images", images);
-
 
     setResults(images);
     setLoading(false);
-
-    console.log("results:", results);
-
   };
 
   return (
@@ -149,7 +166,9 @@ function App() {
 
         {/* Results */}
         {results.length > 0 && (
-          <div className="cmt-6" style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" }}>
+          <div
+            className="mt-6 flex flex-col items-center justify-center w-full"
+          >
             {results.map((url, i) => (
               <img
                 key={i}
