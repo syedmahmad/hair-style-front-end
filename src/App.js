@@ -9,6 +9,7 @@ function App() {
   const [color, setColor] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
+   const [gender, setGender] = useState("");
 
   // --- Helper: convert RGBA image to 3-channel RGB (JPG)
   const convertTo3ChannelRGB = async (file) => {
@@ -84,9 +85,10 @@ function App() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        source: file,
-        styleDescription: style,
-        color,
+        imageUrl: file,
+        haircut: style,
+        hairColor: color,
+        gender: gender
       }),
     });
 
@@ -94,8 +96,8 @@ function App() {
     console.log("backend response:", data);
 
     const images = [];
-    if (data.images?.replicateUrls && Array.isArray(data.images.replicateUrls)) {
-      images.push(...data.images.replicateUrls);
+    if (data.images?.outputUrl) {
+      images.push(data.images?.outputUrl);
     }
 
     setResults(images);
@@ -136,22 +138,56 @@ function App() {
           <label className="block mb-2">Choose Hairstyle:</label>
           <HairstyleSelect
             value={style}
-            onChange={(e) => setStyle(e.target.value)}
+            onChange={(e) => {
+              if (e.target.name === "haircut") setStyle(e.target.value);
+              if (e.target.name === "gender") setGender(e.target.value);
+            }}
           />
         </div>
 
         {/* Color Picker */}
-        <div className="mt-6">
-          <label className="block mb-2">Pick Hair Color:</label>
-          <input
-            type="text"
-            placeholder="Enter color like red, black, purple..."
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            className="p-4 h-10 cursor-pointer rounded"
-            style={{ color: "black" }}
-          />
-        </div>
+          <div className="mt-6">
+            <label className="block mb-2">Pick Hair Color:</label>
+            <select
+              id="hair_color"
+              name="hair_color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              className="w-full border focus:outline-none focus:ring rounded p-2 bg-white text-black dark:bg-r8-gray-1 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="No change">No change</option>
+              <option value="Random">Random</option>
+              <option value="Blonde">Blonde</option>
+              <option value="Brunette">Brunette</option>
+              <option value="Black">Black</option>
+              <option value="Dark Brown">Dark Brown</option>
+              <option value="Medium Brown">Medium Brown</option>
+              <option value="Light Brown">Light Brown</option>
+              <option value="Auburn">Auburn</option>
+              <option value="Copper">Copper</option>
+              <option value="Red">Red</option>
+              <option value="Strawberry Blonde">Strawberry Blonde</option>
+              <option value="Platinum Blonde">Platinum Blonde</option>
+              <option value="Silver">Silver</option>
+              <option value="White">White</option>
+              <option value="Blue">Blue</option>
+              <option value="Purple">Purple</option>
+              <option value="Pink">Pink</option>
+              <option value="Green">Green</option>
+              <option value="Blue-Black">Blue-Black</option>
+              <option value="Golden Blonde">Golden Blonde</option>
+              <option value="Honey Blonde">Honey Blonde</option>
+              <option value="Caramel">Caramel</option>
+              <option value="Chestnut">Chestnut</option>
+              <option value="Mahogany">Mahogany</option>
+              <option value="Burgundy">Burgundy</option>
+              <option value="Jet Black">Jet Black</option>
+              <option value="Ash Brown">Ash Brown</option>
+              <option value="Ash Blonde">Ash Blonde</option>
+              <option value="Titanium">Titanium</option>
+              <option value="Rose Gold">Rose Gold</option>
+            </select>
+          </div>
 
         {/* Generate Button */}
         <div className="flex justify-center mt-6">
