@@ -105,6 +105,110 @@ const hairstyleOptions = [
 ];
 
 
+// Helper function to get the correct image path
+const getImagePath = (optionValue) => {
+  // Special mappings for files that don't follow the standard pattern
+  const specialMappings = {
+    // Files with exact name matches (spaces preserved)
+    "A-Line Bob": "A-Line Bob.jpg",
+    "Angled Bob": "Angled Bob.jpg", 
+    "Asymmetrical Bob": "Asymmetrical Bob.jpg",
+    "Ballerina Braids": "Ballerina Braids.jpg",
+    "Ballerina Bun": "Ballerina Bun.jpg",
+    "Banana Clip Updo": "Banana Clip Updo.jpg",
+    "Bantu Knots": "Bantu Knots.jpg",
+    "Beehive": "Beehive.jpg",
+    "Blunt Bangs": "Blunt Bangs.jpg",
+    "Bob": "Bob.jpg",
+    "Bohemian Braids": "Bohemian Braids.jpg",
+    "Bouffant": "Bouffant.jpg",
+    "Box Braids": "Box Braids.jpg",
+    "Braided Ponytail": "Braided Ponytail.jpg",
+    "Bubble Braid": "Bubble Braid.jpg",
+    "Bubble Ponytail": "Bubble Ponytail.jpg",
+    "Center-Parted": "Center-Parted.jpg",
+    "Chignon": "Chignon.jpg",
+    "Choppy Layers": "Choppy Layers.jpg",
+    "Cornrows": "Cornrows.jpg",
+    "Crochet Braids": "Crochet Braids.jpg",
+    "Crown Braid": "Crown Braid.jpg",
+    "Crown Twist": "Crown Twist.jpg",
+    "Curly": "Curly.jpg",
+    "Double Dutch Braids": "Double Dutch Braids.jpg",
+    "Dreadlocks": "Dreadlocks.jpg",
+    "Dutch Braid": "Dutch Braid.jpg",
+    "Faux Hawk": "FauxHawk.jpg",
+    "Feathered": "Feathered.jpg",
+    "Finger Waves": "Finger Waves.jpg",
+    "Fishtail Braid": "Fishtail Braid.jpg",
+    "Flat Twist": "Flat Twist.jpg",
+    "French Braid": "French Braid.jpg",
+    "French Fishtail Braid": "French Fishtail Braid.jpg",
+    "French Roll": "French Roll.jpg",
+    "French Twist Updo": "French Twist Updo.jpg",
+    "French Twist": "French Twist.jpg",
+    "Glamorous Waves": "Glamorous Waves.jpg",
+    "Graduated Bob": "Graduated Bob.jpg",
+    "Hair Bow": "Hair Bow.jpg",
+    "Half-Up Top Knot": "Half-Up Top Knot.jpg",
+    "Half-Up, Half-Down": "Half-Up, Half-Down.jpg",
+    "Halo Braid": "Halo Braid.jpg",
+    "Heart Braid": "Heart Braid.jpg",
+    "High Ponytail": "High Ponytail.jpg",
+    "Hollywood Waves": "Hollywood Waves.jpg",
+    "Knotted Updo": "Knotted Updo.jpg",
+    "Layered Shag": "Layered Shag.jpg",
+    "Layered": "Layered.jpg",
+    "Lob": "Lob.jpg",
+    "Low Ponytail": "Low Ponytail.jpg",
+    "Messy Bun with a Headband": "Messy Bun with a Headband.jpg",
+    "Messy Bun with a Scarf": "Messy Bun with a Scarf.jpg",
+    "Messy Bun": "Messy Bun.jpg",
+    "Messy Chignon": "Messy Chignon.jpg",
+    "Messy Updo": "Messy Updo.jpg",
+    "Milkmaid Braids": "Milkmaid Braids.jpg",
+    "Mohawk Fade": "Mohawk Fade.jpg",
+    "Mohawk": "Mohawk.jpg",
+    "Ombré": "Ombré.png", // This one is PNG, not JPG
+    "Pageboy": "Pageboy.jpg",
+    "Perm": "Perm.jpg",
+    "Pigtails": "Pigtails.jpg",
+    "Pin Curls": "Pin Curls.jpg",
+    "Pixie Cut": "Pixie Cut.jpg",
+    "Razor Cut": "Razor Cut.jpg",
+    "Rollerset": "Rollerset.jpg",
+    "Rope Braid": "Rope Braid.jpg",
+    "Shag": "Shag.jpg",
+    "Side-Parted": "Side-Parted.jpg",
+    "Side-Swept Bangs": "Side-Swept Bangs.jpg",
+    "Sideswept Pixie": "Sideswept Pixie.jpg",
+    "Simple Chignon": "Simple Chignon.jpg",
+    "Slicked Back": "Slicked Back.jpg",
+    "Soft Waves": "Soft Waves.jpg",
+    "Space Buns": "Space Buns.jpg",
+    "Straight": "Straight.jpg",
+    "Straightened": "Straightened.jpg",
+    "Top Knot": "Top Knot.jpg",
+    "Tousled": "Tousled.jpg",
+    "Twist Out": "Twist Out.jpg",
+    "Twisted Bun": "Twisted Bun.jpg",
+    "Twisted Half-Updo": "Twisted Half-Updo.jpg",
+    "Undercut": "undercut.jpg", // lowercase
+    "Updo": "Updo.jpg",
+    "Victory Rolls": "Victory Rolls.jpg",
+    "Waterfall Braid": "Waterfall Braid.jpg",
+    "Wavy": "Wavy.jpg",
+    "Zig-Zag Part": "zig-zag-part.jpg" // lowercase with hyphens
+  };
+  
+  if (specialMappings[optionValue]) {
+    return `/${specialMappings[optionValue]}`;
+  }
+  
+  // Default pattern: replace spaces with hyphens and convert to lowercase
+  return `/${optionValue.replace(/\s+/g, "-").toLowerCase()}.jpg`;
+};
+
 export const HairstyleSelect = ({ value, onChange }) => {
   const [gender, setGender] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -154,9 +258,8 @@ export const HairstyleSelect = ({ value, onChange }) => {
           >
             <span>{selected ? selected.title : "Select a hairstyle"}</span>
             <svg
-              className={`w-4 h-4 transition-transform ${
-                isOpen ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -176,20 +279,22 @@ export const HairstyleSelect = ({ value, onChange }) => {
                 <div
                   key={option.value}
                   onClick={() => handleSelect(option.value)}
-                  className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-                    value === option.value ? "bg-gray-50" : ""
-                  }`}
+                  className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${value === option.value ? "bg-gray-50" : ""
+                    }`}
                 >
                   <span className="text-sm text-gray-800">{option.title}</span>
-                  {/* 
+
                   <img
-                    src={`/${option.value.replace(/\s+/g, "-")}.jpg`}
+                    src={getImagePath(option.value)}
                     alt={option.value}
                     width={32}
                     height={32}
                     className="ml-3 rounded-sm object-cover border"
-                  /> 
-                  */}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+
                 </div>
               ))}
             </div>
