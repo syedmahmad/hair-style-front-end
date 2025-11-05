@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 
 const hairstyleOptions = [
   // Global options
@@ -279,7 +279,7 @@ export const HairstyleSelect = ({ value, onChange }) => {
                 <div
                   key={option.value}
                   onClick={() => handleSelect(option.value)}
-                  className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${value === option.value ? "bg-gray-50" : ""
+                  className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-gray-100 ${value === option.value ? "bg-gray-50" : ""
                     }`}
                 >
                   <span className="text-sm text-gray-800">{option.title}</span>

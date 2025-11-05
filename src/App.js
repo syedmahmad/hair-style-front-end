@@ -105,7 +105,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-500 to-purple-700 flex items-center justify-center p-6 text-white">
+    <div className="min-h-screen bg-gradient-to-tl from-indigo-400 via-purple-500 to-fuchsia-500 flex items-center justify-center p-6 text-white">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
